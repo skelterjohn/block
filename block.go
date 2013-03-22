@@ -30,7 +30,14 @@ func draw(dw wde.Window) {
 
 func block() {
 	dw, err := wde.NewWindow(100, 100)
+
+	defer func() {
+		dw.Close()
+		wde.Stop()
+	}()
+
 	dw.Show()
+
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -38,7 +45,10 @@ func block() {
 	draw(dw)
 
 	for e := range dw.EventChan() {
-		if _, ok := e.(wde.ResizeEvent); ok {
+		switch e.(type) {
+		case wde.CloseEvent:
+			return
+		case wde.ResizeEvent:
 			draw(dw)
 		}
 	}
